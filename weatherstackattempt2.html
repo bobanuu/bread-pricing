@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bread for Sale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .bread-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Bread for Sale</h1>
+
+<div id="breadContainer"></div>
+
+<script>
+    // Fetch current temperature from Weatherstack
+    function fetchTemperature() {
+        const url = `https://api.weatherstack.com/current?access_key=c51b1b2761dcf735a14974539dba950d&query=toronto`;
+        return fetch(url)
+            .then(response => {
+                console.log("Weatherstack API response:", response);
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    console.error("Weatherstack API error:", data.error.info);
+                    return null; // Return null if there's an error
+                }
+                console.log("Weatherstack temperature data:", data.current.temperature);
+                return data.current.temperature;
+            });
+    }
+
+    // Adjust bread price based on temperature
+    function adjustPriceBasedOnTemperature(bread, temperature) {
+        console.log(`Adjusting price for ${bread.name} based on temperature: ${temperature}`);
+        if (!temperature) return bread.originalPrice; // If no temperature data, return original price
+
+        if (temperature < 19) {
+            return bread.originalPrice * 1.10; // Increase by 10% if temperature is below 10°C
+        } else if (temperature > 30) {
+            return bread.originalPrice * 0.90; // Decrease by 10% if temperature is above 30°C
+        }
+        return bread.originalPrice;
+    }
+
+    // Load data and display on the webpage
+    function loadData() {
+        Promise.all([fetch('bread_remaining.json').then(res => res.json()), fetchTemperature()])
+            .then(([breadData, temperature]) => {
+                console.log("Bread data:", breadData);
+                console.log("Type of breadData:", typeof breadData);
+                console.log("Content of breadData:", JSON.stringify(breadData));
+
+                const breadContainer = document.getElementById('breadContainer');
+                breadContainer.innerHTML = ''; // Clear the container
+
+                breadData.forEach(bread => {
+                    bread.price = adjustPriceBasedOnTemperature(bread, temperature);
+
+                    const breadItem = document.createElement('div');
+                    breadItem.className = 'bread-item';
+                    breadItem.innerHTML = `
+                        <h2>${bread.name}</h2>
+                        <p>Price: $${bread.price.toFixed(2)}</p>
+                        <p>Remaining loaves: ${bread.remaining}</p>
+                    `;
+                    breadContainer.appendChild(breadItem);
+                });
+            })
+            .catch(error => {
+                console.error("An error occurred:", error);
+            });
+    }
+
+    // Load the data when the page loads
+    window.onload = loadData;
+</script>
+
+</body>
+</html>

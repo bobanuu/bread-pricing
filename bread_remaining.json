@@ -1,0 +1,6 @@
+[
+    {"name": "Whole Wheat Bread", "price": 3.50, "originalPrice": 3.50, "remaining": 3},
+    {"name": "Sourdough Bread", "price": 4.00, "originalPrice": 4.00, "remaining": 3},
+    {"name": "Rye Bread", "price": 3.75, "originalPrice": 3.75, "remaining": 3},
+    {"name": "French Baguette", "price": 2.50, "originalPrice": 2.50, "remaining": 3}
+]
